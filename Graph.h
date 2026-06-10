@@ -13,21 +13,21 @@ public:
 	vector<Edge> edgelist;
 	vector<point> pts;
 	vector<int> node_index;
-	bitset<L> all_labels;//ËùÓĞ±êÇ©
-	unordered_map<int, unordered_map<int, list<Path>>> edges_neibr;//µãµ½ÁÚ¾ÓµÄÂ·¾¶¼¯
-	unordered_map<int, pair<int, int>> tolabel;//<±àºÅ£¬<³öÏÖ´ÎÊı£¬¶ÔÓ¦±êÇ©>>
-	unordered_set<int> computed;//Í³¼Æ¼ÆËãµÄ½ÚµãÊıÁ¿
+	bitset<L> all_labels;//æ‰€æœ‰æ ‡ç­¾
+	unordered_map<int, unordered_map<int, list<Path>>> edges_neibr;//ç‚¹åˆ°é‚»å±…çš„è·¯å¾„é›†
+	unordered_map<int, pair<int, int>> tolabel;//<ç¼–å·ï¼Œ<å‡ºç°æ¬¡æ•°ï¼Œå¯¹åº”æ ‡ç­¾>>
+	unordered_set<int> computed;//ç»Ÿè®¡è®¡ç®—çš„èŠ‚ç‚¹æ•°é‡
 
 
-	vector<int> node_height;//´æ´¢½Úµã¸ß¶È
-	vector<vector<array<int, L>>> indexanc_LLSD;//arrayÉÏµÄÊı×ÖÎªINT_MAX£¬±íÊ¾Ã»Â·£¬·ñÔò±íÊ¾ÏÂ½çweight
+	vector<int> node_height;//å­˜å‚¨èŠ‚ç‚¹é«˜åº¦
+	vector<vector<array<int, L>>> indexanc_LLSD;//arrayä¸Šçš„æ•°å­—ä¸ºINT_MAXï¼Œè¡¨ç¤ºæ²¡è·¯ï¼Œå¦åˆ™è¡¨ç¤ºä¸‹ç•Œweight
 
 
 	vector<unordered_map<int, list<Path>>> index;//LSD
-	vector<unordered_map<int, list<Path>>> temp_index;
+	vector<unordered_map<int, list<Path>>> temp_index;//æš‚å­˜è·¯å¾„é›†
 
 
-	vector<int> exist_s, exist_t;
+	vector<int> exist_s, exist_t;//æš‚å­˜è·ç¦»å€¼
 
 	int rho;
 	double rhoavg;
@@ -73,8 +73,8 @@ public:
 	inline bool has_direct_index(int a, int b);
 	inline int Graph1::compute_weight(const int& src, const int& tar, const vector<int>& valid_labels);
 
-	void settingLLSD();//Éú³ÉÍêÈ«Ë÷Òı
-	void settingLLSD_p(int s);//Éú³É²¿·ÖË÷Òı
+	void settingLLSD();//ç”Ÿæˆå®Œå…¨ç´¢å¼•
+	void settingLLSD_p(int s);//ç”Ÿæˆéƒ¨åˆ†ç´¢å¼•
 
 	vector<Path> LLSDJoin(int v, int u, int w);
 
