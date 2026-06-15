@@ -30,7 +30,7 @@ g++ -std=c++17 -O2 Graph.cpp Tree.cpp utility.cpp test.cpp -o LLSD
 ### 运行方式  
 
 ```js
-  .\LLSD.exe [test set] [LSD index] [LLSD index] [hierarchical parameter] [test mode] [query set]
+.\LLSD.exe [test set] [LSD index] [LLSD index] [hierarchical parameter] [test mode] [query set]
 ```
 
 其中:  
