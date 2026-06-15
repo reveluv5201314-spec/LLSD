@@ -78,8 +78,8 @@ public:
 
 	vector<Path> LLSDJoin(int v, int u, int w);
 
-	void query(int s, int t, bitset<L> labels);
-	void queryx(string name);
+	void query(int s, int t, bitset<L> labels, int step);
+	void queryx(string name, int step);
 	void queryx2(string name);
 	
 	
@@ -91,7 +91,7 @@ public:
 	void saveTree(string name);
 	void saveTree_bin(string name);
 	void saveLLSD(string name,int step);
-	void saveLLSD_costum(string name);
+
 
 	void readTree(string name);
 	void readLLSD(string name);

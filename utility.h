@@ -24,7 +24,7 @@
 using namespace std;
 
 #define L 10
-#define STEP 1660
+
 
 
 

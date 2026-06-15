@@ -3,7 +3,7 @@
 
 
 //保存树
-void test_save(string graph, string output1, string output2,int layer) {
+void test_save(string graph, string output1, string output2,int alpha) {
 	Graph1 p;
 	auto t1 = chrono::steady_clock::now();
 	p.readGraph(graph);
@@ -16,19 +16,19 @@ void test_save(string graph, string output1, string output2,int layer) {
 	//p.readTree(output1);
 	p.get_h_and_w();
 	//p.outputTree();
+	p.saveTree(output1);
 
-	//p.saveTree_bin("CAL-10_index_bin.bin");
 	auto t2 = chrono::steady_clock::now();
 	double dr_us1 = chrono::duration<float, std::ratio<1>>(t2 - t1).count();
-	int step = ((layer) / (double)10) * p.height;
+	int step = ((alpha) / (double)100) * p.height;
 	cout << "***tree time cost:" << dr_us1 << endl;
-	//p.readLLSD("NY_LLSD_bitset.bin");
+	//p.readLLSD(output2);
 	t1 = chrono::steady_clock::now();
 	//p.settingLLSD();
 	p.settingLLSD_p(step);
 	
 	t2 = chrono::steady_clock::now();
-	string out_name = "setting_time_result_parr_" + to_string(layer) +"0%_" + graph;
+	string out_name = "setting_time_result_" + to_string(alpha) +"0%_" + graph;
 	ofstream out(out_name);
 	double dr_us2 = chrono::duration<float, std::ratio<1>>(t2 - t1).count();
 	out << graph << ":" << endl;
@@ -36,8 +36,7 @@ void test_save(string graph, string output1, string output2,int layer) {
 	out << "***setting time cost:" << dr_us2 << endl;
 	out.close();
 
-	//p.queryx("query_NY_random.txt");
-
+	
 	p.saveLLSD(output2, step);
 
 	cout << "over" << endl;
@@ -58,7 +57,7 @@ void test_save2hop(string graph, string tree, string output) {
 }
 
 //固定生成1对查询
-void test(string graph, string tree, string LLSD) {
+void test(string graph, string tree, string LLSD, int alpha) {
 	Graph1 p;
 	p.readGraph(graph);
 	for (auto& x : p.tolabel) {
@@ -78,7 +77,8 @@ void test(string graph, string tree, string LLSD) {
 	
 	int s = 115457, t = 113935;   
 	bitset<L> labels{ "0000000010" };
-	p.query(s, t, labels);
+	int step = ((alpha) / (double)100) * p.height;
+	p.query(s, t, labels, step);
 
 	shared_ptr<TreeNode> S = p.node_arr[p.node_index[s]], T = p.node_arr[p.node_index[t]],LCA=p.findLca(s,t);
 
@@ -164,7 +164,7 @@ void temp_var(string graph, string tree, string LLSD) {
 }
 
 
-void querytest(string graph, string tree, string LLSD, string name) {
+void querytest(string graph, string tree, string LLSD, string name, int alpha) {
 	Graph1 p;
 	p.readGraph(graph);
 	p.readTree(tree);
@@ -177,8 +177,8 @@ void querytest(string graph, string tree, string LLSD, string name) {
 	p.get_h_and_w();
 	p.readLLSD(LLSD);
 	//p.settingLLSD();
-
-	p.queryx(name);
+	int step = ((alpha) / (double)100) * p.height;
+	p.queryx(name, step);
 
 }
 
@@ -204,10 +204,22 @@ void querytest2(string graph, string tree, string LLSD, string name) {
 
 int main(int argc, char* argv[]) {
 
-	test_save("NY2.txt", "NY2_index.txt", "NY2_LLSD_bitset.bin",10);
+	string dataset = argv[1];
+	string LSD_index = argv[2];
+	string LLSD_index = argv[3];
 	
-	//querytest("NY2.txt", "NY2_index.txt", "NY2_LLSD_bitset.bin", "query_NY2_min_weight_q_.txt");
+	string alpha = argv[4];//百分之多少
+	string mode = argv[5];
 	
+	if (mode == "0") {
+		if (argc != 6) return 0;
+		test_save(dataset, LSD_index, LLSD_index, stoi(alpha));//生成索引
+	}
+	else {
+		if (argc != 7) return 0;
+		string queryfile = argv[6];
+		querytest(dataset, LSD_index, LLSD_index, queryfile, stoi(alpha));//测试案例
+	}
 
 	return 0;
 }

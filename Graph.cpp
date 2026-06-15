@@ -1409,7 +1409,7 @@ int Graph1::searchDist(int& u, int& v, bitset<L>& labels) {
 
 
 //将标签长度划分等级，求各等级平均时间dij
-void Graph1::queryx(string name) {
+void Graph1::queryx(string name,int step) {
 	ifstream query(name);
 	random_device rd;
 	mt19937 gen(rd());
@@ -1442,7 +1442,7 @@ void Graph1::queryx(string name) {
 			query >> s >> t >> labels;
 
 			auto t1 = chrono::steady_clock::now();
-			int dis_LLSD = LLSD_METHOD(s, t, labels,STEP);
+			int dis_LLSD = LLSD_METHOD(s, t, labels, step);
 			auto t2 = chrono::steady_clock::now();
 			auto dr_us = chrono::duration<double, milli>(t2 - t1).count();
 			visited[i] += computed.size();
@@ -1544,11 +1544,11 @@ void Graph1::queryx2(string name) {
 }
 
 
-void Graph1::query(int s, int t, bitset<L> labels) {
+void Graph1::query(int s, int t, bitset<L> labels, int step) {
 	cout << "*********************************" << endl;
 	
 	auto t1 = chrono::steady_clock::now();	
-	int dis_LLSD = LLSD_METHOD(s, t, labels, STEP);
+	int dis_LLSD = LLSD_METHOD(s, t, labels, step);
 	auto t2 = chrono::steady_clock::now();
 	auto dr_us = chrono::duration<double, micro>(t2 - t1).count();
 	cout << "dis_LLSD=" << dis_LLSD << "m" << endl;
@@ -1953,40 +1953,6 @@ void Graph1::saveLLSD(string name,int step) {
 	out.close();
 }
 
-//按层存
-void Graph1::saveLLSD_costum(string name) {
-	ofstream out(name, ios::binary); int n, value; char data;
-	n = indexanc_LLSD.size(); out.write(reinterpret_cast<char*>(&n), sizeof(int)); uint16_t mask = 0;
-	for (auto& x : indexanc_LLSD) {
-		n = x.size(); out.write(reinterpret_cast<char*>(&n), sizeof(int));
-		int i = 0;
-		for (auto& y : x) {
-			//层内全存
-			if (i++ < STEP) {
-				mask = 0;
-				for (int i = 0; i < L; ++i) {
-					if (y[i] != INT_MAX)
-						mask |= (1 << i); // 设置 bitmask
-				}
-
-				out.write(reinterpret_cast<char*>(&mask), sizeof(uint16_t));
-
-				for (int i = 0; i < L; ++i) {
-					if (mask & (1 << i)) {
-						out.write(reinterpret_cast<const char*>(&y[i]), sizeof(int));
-					}
-				}
-			}
-			else {
-				for (int i = 0; i < L; ++i) if (y[i] != INT_MAX) {
-					value = min(value, y[i]);
-				}
-				out.write(reinterpret_cast<char*>(&value), sizeof(int));
-			}
-		}
-	}
-	out.close();
-}
 
 void Graph1::readTree(string name) {
 	ifstream in(name); int nodenum, valnum, indexnum, pathnum, element; string label; int weight; vector<int> sep;
