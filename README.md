@@ -32,6 +32,7 @@ g++ -std=c++17 -O2 Graph.cpp Tree.cpp utility.cpp test.cpp -o LLSD
 ```js
 .\LLSD.exe [test set] [LSD index] [LLSD index] [hierarchical parameter] [test mode]
 ```
+Read the graph and construct LSD index and LLSD table:
 - [test set] represents the input undirected weighted graph dataset, formatted as ={number of edges, [source vertex, target vertex, edge weight, edge label], [source vertex, target vertex, edge weight, edge label]...}
 - [LSD index] represents the name of the LSD index to be generated, including the decomposition tree structure
 - [LLSD index] represents the name of the LLSD index to be generated
@@ -43,7 +44,7 @@ g++ -std=c++17 -O2 Graph.cpp Tree.cpp utility.cpp test.cpp -o LLSD
 ```js
 .\LLSD.exe [test set] [LSD index] [LLSD index] [hierarchical parameter] [test mode] [query set]
 ```
-
+Read in graph, LSD index, LLSD table, and query dataset:
 - [test set] represents the input undirected weighted graph dataset, formatted as ={number of edges, [source vertex, target vertex, edge weight, edge label], [source vertex, target vertex, edge weight, edge label]...}
 - [LSD index] represents the name of the LSD index to be loaded, including the decomposition tree structure
 - [LLSD index] represents the name of the LLSD index to be loaded
