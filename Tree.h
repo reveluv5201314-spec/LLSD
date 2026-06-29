@@ -8,10 +8,10 @@ public:
 	shared_ptr<TreeNode> prev1;
 	shared_ptr<TreeNode> prev2;
 	vector<shared_ptr<TreeNode>> children;
-	vector<int> val;//节点内序号
-	vector<int> valanc;//存放祖先结点序号,顺序为从根节点到本节点（包括本节点）
+	vector<int> val;//Node internal serial number
+	vector<int> valanc;//Store ancestor node numbers in order from the root node to the current node (including the current node)
 
-	unordered_map<int, int> distance;//点到点的最短距离，dls
+	unordered_map<int, int> distance;//The shortest distance from point to point, dls
 
 
 public:
