@@ -87,22 +87,22 @@ struct Mytuple {
 class point {
 public:
 	int id;
-	int du;//度
+	int du;//degree
 	int du2;
 	int _du;
 	int _du2;
 	bool changed;
-	map<int, int> neighbors;//点的邻居及在这个点的edge_neibr中是否存了边
+	map<int, int> neighbors;//Are there any edges in the neighbors of the point and its edge_neibr
 public:
 	point(int id) : id(id), du(0), du2(0), _du(0), _du2(0), changed(false) {};
 	~point();
 	void deleteNei(int i);
 	bool operator< (const point p) const {
 		if (du != p.du)
-			return du < p.du; // 比较 DD 数组中的度数
+			return du < p.du; 
 		if (du2 != p.du2)
-			return du2 < p.du2; // 如果度数相等，比较 DD2 数组中的度数
-		return id < p.id; // 如果度数都相等，比较节点编号大小
+			return du2 < p.du2;
+		return id < p.id;
 	}
 };
 struct Point_co {
