@@ -1,15 +1,15 @@
 ﻿#include "Graph.h"
 
 
-//读图
+//Read the graph
 void Graph::readGraph(string graphname) {
 	cout << "read Graph" << endl;
 	ifstream ifs(graphname);
 	ifs >> edgeNum;
 	int src, tar, label_i; int x = 0;
 	double weight;
-	vector < pair<int, int>> temp;// <编号，出现次数>
-	unordered_map<int, int> temp2;// <编号，标签>
+	vector < pair<int, int>> temp;// <ID, occurrence count>
+	unordered_map<int, int> temp2;// <ID, Label>
 	for (int i = 0; i < edgeNum; i++) {
 		ifs >> src >> tar >> weight >> label_i;
 		if (temp2.find(label_i) == temp2.end()) {
@@ -44,7 +44,7 @@ void Graph::readGraph(string graphname) {
 			Edge e = { src, tar, weight,arr };
 			edgelist.emplace_back(e);
 			tar = src > tar ? src : tar;
-			ptsNum = ptsNum > tar ? ptsNum : tar;//统计点数量		
+			ptsNum = ptsNum > tar ? ptsNum : tar;//Number of points		
 		}
 	}
 
@@ -64,7 +64,7 @@ void Graph::readGraph(string graphname) {
 	sortPaths();
 }
 
-//初始化图
+//Initialization graph
 void Graph::organizeGraph() {
 	for (int i = 0; i <= ptsNum; i++) {
 		point p(i);
@@ -89,7 +89,7 @@ void Graph::organizeGraph() {
 	}
 }
 
-//对所有节点的邻居路径进行排序
+//Sort the neighbor paths of all points
 void Graph::sortPaths() {
 	for (auto p : pts) {
 		for (auto n : p.neighbors) {
@@ -103,7 +103,7 @@ void Graph::sortPaths() {
 	}
 }
 
-//树分解
+//Tree decomposition
 void Graph1::treeNodeContraction() {
 	cout << "treeNodeContraction" << endl;
 	double dr_us12 = 0, dr_us23 = 0, dr_us34 = 0, dr_us45 = 0, dr_usjoin = 0, dr_usprune = 0; int i = 0, j = 0;
@@ -113,10 +113,10 @@ void Graph1::treeNodeContraction() {
 	}
 	while (!deg.empty()) {
 
-		//取得最小度点
+		//Obtain the minimum degree point
 		point* _p = &pts[(*deg.begin()).id];
 
-		// 如果某个节点的度数变化，更新
+		// If the degree of a node changes, update it
 		while (true) {
 			if (_p->changed) {
 				deg.erase(*_p);
@@ -128,7 +128,7 @@ void Graph1::treeNodeContraction() {
 			}
 			else break;
 		}
-		deg.erase(deg.begin()); // 删除该点
+		deg.erase(deg.begin()); // Delete point
 		++i; ++j;
 		if (i == 1000) {
 			cout << j << endl;
@@ -145,16 +145,16 @@ void Graph1::treeNodeContraction() {
 
 		for (auto e : p.neighbors) {
 			nod->val.emplace_back(e.first);
-			if (e.second == 1)//如果delete_point_id存了对于e.first的边
+			if (e.second == 1)//If delete_point_id stores edges for e.first
 				index[p.id][e.first] = edges_neibr[p.id][e.first];
 			else
 				index[p.id][e.first] = edges_neibr[e.first][p.id];
 
 		}
 
-		//删除该点
+		//Delete point
 		vector<pair<int, int>> neighbors_list(p.neighbors.begin(), p.neighbors.end());
-		for (auto& i : neighbors_list) {//遍历最小度点的各个邻居
+		for (auto& i : neighbors_list) {//Traverse the neighbors of the minimum degree point
 			auto& neighbor = pts[i.first];
 
 			neighbor.neighbors.erase(p.id);
@@ -167,10 +167,9 @@ void Graph1::treeNodeContraction() {
 			}
 			else neighbor.changed = true;
 		}
-		//删除该点
 
 		int i_first, j_first;
-		//生成邻居边
+		//Generate neighbor edges
 		for (auto i = p.neighbors.begin(); i != p.neighbors.end(); ++i) {
 			for (auto j = next(i, 1); j != p.neighbors.end(); ++j) {
 				list<Path>* p1, * p2;
@@ -185,10 +184,10 @@ void Graph1::treeNodeContraction() {
 				auto& I = pts[i_first];
 				auto& J = pts[j_first];
 				list<Path> paths = pathJoin(*p1, *p2,p.id);
-				if (I.neighbors.find(j_first) == I.neighbors.end()) {//如果i和j还未存在边
+				if (I.neighbors.find(j_first) == I.neighbors.end()) {//If there is no edge between i and j yet
 					edges_neibr[i_first][j_first] = paths;
 					I.neighbors.insert(make_pair(j_first, 1));
-					J.neighbors.insert(make_pair(i_first, 0));//新形成了边，存入邻居信息
+					J.neighbors.insert(make_pair(i_first, 0));//Newly formed edge, storing neighbor information
 					I._du++;
 					J._du++;
 					I._du2++;
@@ -212,7 +211,7 @@ void Graph1::treeNodeContraction() {
 	}
 }
 
-//生成分解树
+//Generate decomposition tree
 void Graph1::treeFormation() {
 	cout << "treeFormation" << endl;
 	//pts.clear();
@@ -234,7 +233,7 @@ void Graph1::treeFormation() {
 	cout << "treeFormation-over" << endl;
 }
 
-//回溯祖先信息
+//Tracing back ancestral information
 void Graph1::labelAssignment() {
 	auto t1 = chrono::steady_clock::now();
 
@@ -280,7 +279,7 @@ void Graph1::labelAssignment() {
 	cout << "addAnc-over" << endl;
 }
 
-//输出树
+//Output tree
 void Graph1::outputTree() {
 	cout << "*********Tree :*********" << endl;
 	queue<shared_ptr<TreeNode>> q;
@@ -296,21 +295,21 @@ void Graph1::outputTree() {
 	cout << "*********Tree :*********" << endl;
 }
 
-//为结点保存祖先信息，排序索引的pathset
+//Save ancestor information for nodes and sort the pathset index
 void Graph1::addAnc() {
 	queue<shared_ptr<TreeNode>> q;
 	q.push(root);
-	root->valanc.emplace_back(root->val[0]);//根节点的valanc只有自己
+	root->valanc.emplace_back(root->val[0]);//The root node's valanc is only its own
 	node_height[root->val[0]] = 1;
 	while (!q.empty()) {
 		shared_ptr<TreeNode> p = q.front();
 		q.pop();
 		for (auto& c : p->children) {
 
-			for (auto x : p->valanc) c->valanc.emplace_back(x);//依次向子节点插入父节点的valanc
-			c->valanc.emplace_back(c->val[0]);//最后插入子节点自己的val
+			for (auto x : p->valanc) c->valanc.emplace_back(x);//Insert the parent node's valanc into the child nodes sequentially
+			c->valanc.emplace_back(c->val[0]);//Finally, insert the child node's own val
 			node_height[c->val[0]] = c->valanc.size();
-			//对index中，每个点的路径组进行排序，即index中的路径都是按weight从小到大排序
+			//Sort the path groups of each point in the index, that is, the paths in the index are sorted in ascending order of weight
 			for (auto& x : index[c->val[0]])
 				x.second.sort([](Path& a, Path& b) {return a.weight < b.weight; });
 
@@ -319,7 +318,7 @@ void Graph1::addAnc() {
 	}
 }
 
-//寻找s和t的LCA
+//Searching for LCA of s and t
 shared_ptr<TreeNode> Graph1::findLca(int s, int t) {
 	shared_ptr<TreeNode> S = node_arr[node_index[s]], T = node_arr[node_index[t]];
 	auto si = S->valanc.begin(), ti = T->valanc.begin();
@@ -373,8 +372,8 @@ inline int Graph1::compute_weight(const int& src, const int& tar, const vector<i
 
 template<typename T, typename Container = std::vector<T>, typename Compare = std::less<T>>
 struct ExposedPQ : public std::priority_queue<T, Container, Compare> {
-	using std::priority_queue<T, Container, Compare>::c; // 暴露底层容器
-	// 构造函数传入比较器
+	using std::priority_queue<T, Container, Compare>::c; // Expose the bottom container
+	// Constructor passed in comparator
 	ExposedPQ(const Compare& comp = Compare()) : std::priority_queue<T, Container, Compare>(comp) {}
 
 	void clear() noexcept {
@@ -401,13 +400,13 @@ int Graph1::LLSD(int s, int t, bitset<L> labels) {
 	using PQType = ExposedPQ<Mytuple, std::vector<Mytuple>, decltype(compare)>;
 
 	PQType qs(compare), qt(compare);
-	vector<Mytuple> qs_, qt_, temp_;
+	vector<Mytuple> qs_, qt_, temp_;//candidate array
 	
 	shared_ptr<TreeNode> S = node_arr[node_index[s]], T = node_arr[node_index[t]], LCA = findLca(s, t), SRC, PAR;
 	int lca = LCA->val[0];
 	fill(exist_s.begin(), exist_s.end(), INT_MAX);
 	fill(exist_t.begin(), exist_t.end(), INT_MAX);
-	unordered_map<int, int> dis_s, dis_t;//暂存
+	unordered_map<int, int> dis_s, dis_t;//temporary storage
 	vector<tuple<int, int, int>> hs;//<h,weight>
 	unordered_set<int>vals;
 
@@ -424,7 +423,7 @@ int Graph1::LLSD(int s, int t, bitset<L> labels) {
 	};
 
 	if (hs.empty()) return INT_MAX;
-	//至此计算出来了所有的最短距离下界,然后排序
+	//All the shortest distance lower bounds have been calculated, and then sorted
 	sort(hs.begin(), hs.end(), [](tuple<int, int, int>& a, tuple<int, int, int>& b) {return get<1>(a) + get<2>(a) < get<1>(b) + get<2>(b); });
 	int now_h = get<0>(hs[index_h]),tar;
 	int s_height_diff = node_height[s] - node_height[lca], t_height_diff = node_height[t] - node_height[lca];
@@ -439,11 +438,11 @@ int Graph1::LLSD(int s, int t, bitset<L> labels) {
 	unordered_set<int> par_child_vals;
 
 	while (now_h != -1) {
-		//当最小距离小于下一估值，结束
+		//When the minimum distance is less than the next estimated value, end
 		if (get<1>(hs[index_h - 2]) + get<2>(hs[index_h - 2]) >= min_dis)
 			break;
 
-		//s计算到now_h
+		//Calculate from s to now_h
 		while (qs.size()) {
 			
 			tup = qs.top();
@@ -463,7 +462,7 @@ int Graph1::LLSD(int s, int t, bitset<L> labels) {
 					dis_s[now_h] = min(real_dis + weight1, dis_s[now_h]);
 					if (dis_t[now_h] != INT_MAX) min_dis = min(min_dis, dis_s[now_h] + dis_t[now_h]);
 				}
-				//直接加入候选数组
+				//Directly add to the candidate array
 				qs_.emplace_back(tup);
 				continue;
 			}
@@ -500,7 +499,7 @@ int Graph1::LLSD(int s, int t, bitset<L> labels) {
 		}
 		dis_s_now_h = dis_s[now_h];
 
-		//t计算到now_h,如果s已经到不了now_h，那t这边就不算了
+		//Calculate t to now_h, if s cannot reach now_h, then t will not calculate on this side
 		if (dis_s_now_h != INT_MAX) while (qt.size()) {
 			
 			tup = qt.top();
@@ -520,7 +519,6 @@ int Graph1::LLSD(int s, int t, bitset<L> labels) {
 					if (dis_s[now_h] != INT_MAX) min_dis = min(min_dis, dis_s[now_h] + dis_t[now_h]);
 				}
 
-				//直接加入候选队列
 				qt_.emplace_back(tup);
 				
 				continue;
@@ -560,11 +558,11 @@ int Graph1::LLSD(int s, int t, bitset<L> labels) {
 		}
 		dis_t_now_h = dis_t[now_h];
 
-		//计算和
+		//sum
 		if (dis_s_now_h != INT_MAX && dis_t_now_h != INT_MAX) if (min_dis > dis_s_now_h + dis_t_now_h)
 			min_dis = dis_s_now_h + dis_t_now_h;
 
-		//qs切到下一个h
+		//qs switches to the next h
 		if (next_h != -1) {
 			move(qs.c.begin(), qs.c.end(), std::back_inserter(qs_));
 			qs.clear();
@@ -628,7 +626,7 @@ int Graph1::LLSD(int s, int t, bitset<L> labels) {
 	return min_dis;
 }
 
-//单边情况
+//Unilateral situation
 int Graph1::LLSD_single(int s, int t, bitset<L> labels,int step) {
 	vector<int> valid_labels;
 	for (int l = 0; l < L; ++l) {
@@ -646,8 +644,8 @@ int Graph1::LLSD_single(int s, int t, bitset<L> labels,int step) {
 	shared_ptr<TreeNode> S = node_arr[node_index[s]], LCA = node_arr[node_index[t]], S_TAR = S, SRC, PAR;
 	fill(exist_s.begin(), exist_s.end(), INT_MAX);
 
-	unordered_map<int, int> dis_s;//记录本轮
-	unordered_map<int, int> dis_s_all;//记录所有
+	unordered_map<int, int> dis_s;//Record this round
+	unordered_map<int, int> dis_s_all;//Record all
 
 	int weight1 = INT_MAX, weight2 = INT_MAX;
 	int max_size = 0;
@@ -659,15 +657,15 @@ int Graph1::LLSD_single(int s, int t, bitset<L> labels,int step) {
 	bool flag_s = 1;
 	vector<int> hs;
 	dis_s_all[s] = 0;
-	//先一直算到最后一层
+	//Keep counting until the last layer
 	while (flag_s) {
 		qs.clear();
 		qs_.clear();
 		hs.clear();
 
-		//根据上一轮的终点设置起点
+		//Set the starting point based on the endpoint of the previous round
 		for (auto& x : S_TAR->val) if (dis_s_all.find(x) != dis_s_all.end() && dis_s_all[x] != INT_MAX) qs.push({ x, 0, dis_s_all[x] });
-		//更新终点
+		//Update endpoint
 		if (node_height[s_tar] - node_height[lca] <= step) {
 			flag_s = 0;
 			continue;
@@ -679,7 +677,7 @@ int Graph1::LLSD_single(int s, int t, bitset<L> labels,int step) {
 		else s_tar = *(S_TAR->valanc.rbegin() + step);
 		S_TAR = node_arr[node_index[s_tar]];
 
-		//设置本轮的终点和记录位
+		//Set the endpoint and record position for this round
 		dis_s.clear();
 		for (auto& x : S_TAR->val) if (dis_s_all.find(x) == dis_s_all.end()) {
 			dis_s[x] = INT_MAX;
@@ -690,7 +688,7 @@ int Graph1::LLSD_single(int s, int t, bitset<L> labels,int step) {
 
 		for (auto& x : hs) {
 			tar_h = x;
-			//qs切换h
+			//switch h
 			move(qs.c.begin(), qs.c.end(), back_inserter(qs_));
 			qs.clear();
 			temp_.clear();
@@ -718,7 +716,7 @@ int Graph1::LLSD_single(int s, int t, bitset<L> labels,int step) {
 			}
 			qs_ = temp_;
 
-			//s计算到s_tar
+			//Calculate s to s_tar
 			while (qs.size()) {
 				tup = qs.top();
 				src = tup.src;
@@ -731,7 +729,7 @@ int Graph1::LLSD_single(int s, int t, bitset<L> labels,int step) {
 				if (has_direct_index(src, tar_h)) {
 					weight1 = searchDist(src, tar_h, labels);
 					if (weight1 != INT_MAX) dis_s[tar_h] = min(real_dis + weight1, dis_s[tar_h]);
-					//直接加入候选数组
+					
 					qs_.emplace_back(tup);
 					continue;
 				}
@@ -764,7 +762,7 @@ int Graph1::LLSD_single(int s, int t, bitset<L> labels,int step) {
 				}
 			}
 		}
-		//将本轮记录存下
+		//Save the records of this round
 		for (auto& x : dis_s) dis_s_all[x.first] = x.second;
 	}
 
@@ -794,7 +792,7 @@ int Graph1::LLSD_single(int s, int t, bitset<L> labels,int step) {
 			if (weight1 != INT_MAX) {
 				min_dis = min(real_dis + weight1, min_dis);
 			}
-			//直接加入候选数组
+			
 			qs_.emplace_back(tup);
 			continue;
 		}
@@ -830,7 +828,7 @@ int Graph1::LLSD_single(int s, int t, bitset<L> labels,int step) {
 
 	return min_dis;
 }
-//层次化
+//hierarchical
 int Graph1::LLSD_layering(int s, int t, bitset<L> labels,int step) {
 	if (node_height[s] > node_height[t]) swap(s, t);
 	vector<int> valid_labels;
@@ -849,8 +847,8 @@ int Graph1::LLSD_layering(int s, int t, bitset<L> labels,int step) {
 	shared_ptr<TreeNode> S = node_arr[node_index[s]], T = node_arr[node_index[t]], LCA = findLca(s, t), S_TAR = S, T_TAR = T, SRC, PAR;
 	fill(exist_s.begin(), exist_s.end(), INT_MAX);
 	fill(exist_t.begin(), exist_t.end(), INT_MAX);
-	unordered_map<int, int> dis_s, dis_t;//记录本轮
-	unordered_map<int, int> dis_s_all, dis_t_all;//记录所有
+	unordered_map<int, int> dis_s, dis_t;//Record this round
+	unordered_map<int, int> dis_s_all, dis_t_all;//Record all
 
 	int weight1 = INT_MAX, weight2 = INT_MAX;
 	int max_size = 0;
@@ -863,17 +861,17 @@ int Graph1::LLSD_layering(int s, int t, bitset<L> labels,int step) {
 	vector<int> hs;
 	dis_s_all[s] = 0; dis_t_all[t] = 0;
 	int final_mid = 0;
-	//先一直算到最后一层
+	//Keep counting until the last layer
 	while (flag_s || flag_t) {
-		//s侧
+		//s side
 		if (flag_s) {
 			qs.clear();
 			qs_.clear();
 			hs.clear();
 
-			//根据上一轮的终点设置起点
+			//Set the starting point based on the endpoint of the previous round
 			for (auto& x : S_TAR->val) if (dis_s_all.find(x) != dis_s_all.end() && dis_s_all[x] != INT_MAX) qs.push({ x, 0, dis_s_all[x] });
-			//更新终点
+			//Update endpoint
 			if (node_height[s_tar] - node_height[lca] <= step) {
 				flag_s = 0;
 				continue;
@@ -885,7 +883,7 @@ int Graph1::LLSD_layering(int s, int t, bitset<L> labels,int step) {
 			else s_tar = *(S_TAR->valanc.rbegin() + step);
 			S_TAR = node_arr[node_index[s_tar]];
 
-			//设置本轮的终点和记录位
+			//Set the endpoint and record position for this round
 			dis_s.clear();
 			for (auto& x : S_TAR->val) if (dis_s_all.find(x) == dis_s_all.end()) {
 				dis_s[x] = INT_MAX;
@@ -897,7 +895,7 @@ int Graph1::LLSD_layering(int s, int t, bitset<L> labels,int step) {
 			int ind = 0;
 			for (auto& x : hs) {
 				tar_h = x;
-				//qs切换h
+				//qs switching h
 				move(qs.c.begin(), qs.c.end(), back_inserter(qs_));
 				qs.clear();
 				temp_.clear();
@@ -929,7 +927,7 @@ int Graph1::LLSD_layering(int s, int t, bitset<L> labels,int step) {
 				}
 				qs_ = temp_;
 
-				//s计算到s_tar
+				//Calculate s to s_tar
 				while (qs.size()) {
 					tup = qs.top();
 					src = tup.src;
@@ -946,7 +944,7 @@ int Graph1::LLSD_layering(int s, int t, bitset<L> labels,int step) {
 						if (weight1 != INT_MAX) {
 							dis_s[tar_h] = min(real_dis + weight1, dis_s[tar_h]);
 						}
-						//直接加入候选数组
+						
 						qs_.emplace_back(tup);
 						continue;
 					}
@@ -982,19 +980,19 @@ int Graph1::LLSD_layering(int s, int t, bitset<L> labels,int step) {
 				}
 				++ind;
 			}
-			//将本轮记录存下
+			//Save the records of this round
 			for (auto& x : dis_s) dis_s_all[x.first] = x.second;
 		}
 
-		//t侧
+		//t side
 		if (flag_t) {
 			qt.clear();
 			qt_.clear();
 			hs.clear();
 
-			//根据上一轮的终点设置起点
+			//Set the starting point based on the endpoint of the previous round
 			for (auto& x : T_TAR->val) if (dis_t_all.find(x) != dis_t_all.end() && dis_t_all[x] != INT_MAX) qt.push({ x, 0, dis_t_all[x] });
-			//更新终点
+			//Update endpoint
 			if (node_height[t_tar] - node_height[lca] <= step) {
 				flag_t = 0;
 				continue;
@@ -1006,7 +1004,7 @@ int Graph1::LLSD_layering(int s, int t, bitset<L> labels,int step) {
 			else t_tar = *(T_TAR->valanc.rbegin() + step);
 			T_TAR = node_arr[node_index[t_tar]];
 
-			//设置本轮的终点和记录位
+			//Set the endpoint and record position for this round
 			dis_t.clear();
 			for (auto& x : T_TAR->val) if (dis_t_all.find(x) == dis_t_all.end()) {
 				dis_t[x] = INT_MAX;
@@ -1017,7 +1015,7 @@ int Graph1::LLSD_layering(int s, int t, bitset<L> labels,int step) {
 			int ind = 0;
 			for (auto& x : hs) {
 				tar_h = x;
-				//qt切换h
+				//qt switch h
 				move(qt.c.begin(), qt.c.end(), back_inserter(qt_));
 				qt.clear();
 				temp_.clear();
@@ -1048,7 +1046,7 @@ int Graph1::LLSD_layering(int s, int t, bitset<L> labels,int step) {
 				}
 				qt_ = temp_;
 
-				//t计算到t_tar
+				//Calculate t to t_tar
 				while (qt.size()) {
 					tup = qt.top();
 					src = tup.src;
@@ -1065,7 +1063,7 @@ int Graph1::LLSD_layering(int s, int t, bitset<L> labels,int step) {
 							dis_t[tar_h] = min(real_dis + weight1, dis_t[tar_h]);
 
 						}
-						//直接加入候选数组
+						
 						qt_.emplace_back(tup);
 						continue;
 					}
@@ -1100,12 +1098,12 @@ int Graph1::LLSD_layering(int s, int t, bitset<L> labels,int step) {
 				++ind;
 			}
 
-			//将本轮记录存下
+			//Save the records of this round
 			for (auto& x : dis_t) dis_t_all[x.first] = x.second;
 		}
 	}
 
-	//最后一层用排序做
+	//The last layer is sorted
 	vector<pair<int, int>> hs_;//<h,weight>
 	hs_.reserve(LCA->val.size());
 	dis_s.clear();
@@ -1129,7 +1127,7 @@ int Graph1::LLSD_layering(int s, int t, bitset<L> labels,int step) {
 
 	if (hs_.empty())return INT_MAX;
 
-	//至此计算出来了所有的最短距离下界,然后排序
+	
 	sort(hs_.begin(), hs_.end(), [](pair<int, int>& a, pair<int, int>& b) {return a.second < b.second; });
 	int index_h = 0, min_dis = INT_MAX;
 	int now_h = hs_[index_h++].first, next_h = index_h >= hs_.size() ? -1 : hs_[index_h++].first, tar;
@@ -1138,7 +1136,7 @@ int Graph1::LLSD_layering(int s, int t, bitset<L> labels,int step) {
 	qs_.clear();
 	qt.clear();
 	qt_.clear();
-	//预先计算出一个mindis
+	//Pre calculate a mindis
 	for (auto& x : S_VAL) {
 		qs.emplace(x, compute_weight(x, now_h, valid_labels), dis_s_all[x]);
 		if (dis_s.find(x) != dis_s.end()) {
@@ -1161,11 +1159,11 @@ int Graph1::LLSD_layering(int s, int t, bitset<L> labels,int step) {
 	}
 
 	while (now_h != -1) {
-		//当最小距离小于下一估值，结束
+		//When the minimum distance is less than the next estimated value, end
 		if (hs_[index_h - 2].second >= min_dis)
 			break;
 
-		//s计算到now_h
+		//Calculate from s to now_h
 		while (qs.size()) {
 			tup = qs.top();
 			src = tup.src;
@@ -1193,7 +1191,7 @@ int Graph1::LLSD_layering(int s, int t, bitset<L> labels,int step) {
 					exist_s[node_height[now_h] - 1] = temp_dis;
 					}
 				}
-				//直接加入候选数组
+				
 				qs_.emplace_back(tup);
 				continue;
 			}
@@ -1235,7 +1233,7 @@ int Graph1::LLSD_layering(int s, int t, bitset<L> labels,int step) {
 		}
 		dis_s_now_h = dis_s[now_h];
 
-		//t计算到now_h,如果s已经到不了now_h，那t这边就不算了
+		//Calculate t to now_h, if s cannot reach now_h, then t will not calculate on this side
 		if (dis_s_now_h != INT_MAX) while (qt.size()) {
 			tup = qt.top();
 			src = tup.src;
@@ -1268,7 +1266,7 @@ int Graph1::LLSD_layering(int s, int t, bitset<L> labels,int step) {
 					
 					}
 				}
-				//直接加入候选数组
+				
 				qt_.emplace_back(tup);
 				continue;
 			}
@@ -1309,13 +1307,13 @@ int Graph1::LLSD_layering(int s, int t, bitset<L> labels,int step) {
 		}
 		dis_t_now_h = dis_t[now_h];
 
-		//计算和
+		//sum
 		if (dis_s_now_h != INT_MAX && dis_t_now_h != INT_MAX) if (min_dis > dis_s_now_h + dis_t_now_h) {
 			min_dis = dis_s_now_h + dis_t_now_h;
 			final_mid = now_h;
 		}
 
-		//qs切到下一个h
+		//Switch h
 		if (next_h != -1) {
 			std::move(qs.c.begin(), qs.c.end(), std::back_inserter(qs_));
 			qs.clear();
@@ -1388,17 +1386,17 @@ int Graph1::LLSD_layering(int s, int t, bitset<L> labels,int step) {
 }
 
 
-//为原子变量更新最小值
+//Update the minimum value for atomic variables
 inline void atomic_min(std::atomic<int>& target, int value) {
 	int old_val = target.load();
 	while (old_val > value && !target.compare_exchange_weak(old_val, value)) {}
 }
 
-//查找u,v在L下的最短距离
+//Find the shortest distance between u and v under L
 int Graph1::searchDist(int& u, int& v, bitset<L>& labels) {
 	if (u == v) return 0;
 	if (index[u].find(v) != index[u].end()) {
-		for (auto& x : index[u][v]) if ((x.labels & labels) == x.labels) return x.weight; return INT_MAX;//index路径为weight递增
+		for (auto& x : index[u][v]) if ((x.labels & labels) == x.labels) return x.weight; return INT_MAX;//The index path increases weight incrementally
 	}
 	else {
 		for (auto& x : index[v][u]) if ((x.labels & labels) == x.labels) return x.weight; return INT_MAX;
@@ -1408,7 +1406,7 @@ int Graph1::searchDist(int& u, int& v, bitset<L>& labels) {
 
 
 
-//将标签长度划分等级，求各等级平均时间dij
+//Divide the tag length into levels and calculate the average time for each level
 void Graph1::queryx(string name,int step) {
 	ifstream query(name);
 	random_device rd;
@@ -1477,7 +1475,7 @@ void Graph1::queryx(string name,int step) {
 	record_output << "LLSDD average query time is " << total / 5 << "ms" << endl;
 }
 
-//固定q，然后改变beta，即step
+//Fix q and then change beta, i.e. step
 void Graph1::queryx2(string name) {
 	random_device rd;
 	mt19937 gen(rd());
@@ -1609,16 +1607,16 @@ void Graph1::settingLLSD() {
 		indexanc_LLSD[v].resize(n_v - 1);
 
 		shared_ptr<TreeNode> t = p;
-		unordered_set<int> anc2(p->valanc.begin(), p->valanc.end());//暂存用于indexanc_LLSD构建
+		unordered_set<int> anc2(p->valanc.begin(), p->valanc.end());//Temporarily stored for the construction of indexanc_LLSD
 		anc2.erase(v);
 
 
 		
-		for (auto x : index[v]) {//先把index的先存下来
+		for (auto x : index[v]) {//Save the index first
 			if (x.first == v)continue;
 			entry.fill(INT_MAX);
 
-			//从后往前，因为index按weight从小到大排，所以现在先放大的，再用小的来覆盖
+			//From back to front, because the index is ranked from small to large by weight, we will first enlarge it and then cover it with the smaller one
 			for (list<Path>::reverse_iterator pre = x.second.rbegin(); pre != x.second.rend(); ++pre) {
 				for (int j = L - 1; j >= 0; --j) if (pre->labels[j] == 1) {
 					entry[j] = pre->weight;
@@ -1658,7 +1656,7 @@ void Graph1::settingLLSD() {
 		
 
 		counts++;
-		//如果已经到叶节点，删除不再使用的临时索引
+		//If it has reached the leaf node, delete the temporary index that is no longer in use
 		flag[v] = p->children.size();
 		if (flag[v] == 0) {
 			
@@ -1718,11 +1716,11 @@ void Graph1::settingLLSD_p(int s) {
 			TMP = TMP->parent;
 		}
 
-		for (auto x : index[v]) {//先把index的先存下来
+		for (auto x : index[v]) {
 			if (x.first == v)continue;
 			entry.fill(INT_MAX);
 
-			//从后往前，因为index按weight从小到大排，所以现在先放大的，再用小的来覆盖
+			
 			for (list<Path>::reverse_iterator pre = x.second.rbegin(); pre != x.second.rend(); ++pre) {
 				for (int j = L - 1; j >= 0; --j) if (pre->labels[j] == 1) {
 					entry[j] = pre->weight;
@@ -1766,7 +1764,7 @@ void Graph1::settingLLSD_p(int s) {
 
 
 		counts++;
-		//如果已经到叶节点，删除不再使用的临时索引
+		
 		flag[v] = p->children.size();
 		if (flag[v] == 0) {
 
@@ -1826,7 +1824,7 @@ void Graph1::outputLabel(string datasetname) {
 	ofs.close();
 }
 
-//输出树高与树宽等信息
+//Output information such as tree height and width
 void Graph1::get_h_and_w() {
 	queue<shared_ptr<TreeNode>> q; q.push(root);
 	height = 0; width = 0;
@@ -1857,21 +1855,21 @@ void Graph1::get_h_and_w() {
 	exist_s.resize(height+1, INT_MAX);
 	exist_t.resize(height+1, INT_MAX);
 	totalvalnums /= ptsNum;
-	cout << "树高：" << height << "  树宽：" << width << "  单个节点最大val数：" << valnums << "  平均节点val数" << totalvalnums << endl;
+	cout << "tree height：" << height << "  tree width ：" << width << "  Maximum val count for a single node:" << valnums << "  Average number of node vals:" << totalvalnums << endl;
 	cout << "rou: " << rou / n << " rou_max: " << rou_max << endl;
 }
 
 void Graph1::saveTree(string name) {
 	ofstream out(name); int n;
-	n = node_arr.size(); out << n << " ";//node的数量
+	n = node_arr.size(); out << n << " ";//Number of nodes
 	for (auto e : node_arr) {
-		n = e->val.size(); out << n << " ";//val的数量
+		n = e->val.size(); out << n << " ";//The quantity of val
 		for (auto i : e->val)	out << i << " ";
 
-		n = index[e->val[0]].size(); out << n << " ";//index的数量
+		n = index[e->val[0]].size(); out << n << " ";//The number of indices
 		for (auto i : index[e->val[0]]) {
 			out << i.first << " ";
-			n = i.second.size(); out << n << " ";//path的数量
+			n = i.second.size(); out << n << " ";//The number of paths
 			for (auto e : i.second) {
 				out << e.weight << " ";// out << e.sep << " ";
 				for (int j = e.labels.size() - 1; j >= 0; --j) out << e.labels[j];
@@ -1880,29 +1878,29 @@ void Graph1::saveTree(string name) {
 
 		}
 	}
-	n = node_index.size(); out << n << " ";//node_index的数量
+	n = node_index.size(); out << n << " ";//The quantity of node_index
 	for (auto x : node_index) out << x << " ";
 	out.close();
 }
 
 void Graph1::saveTree_bin(string name) {
 	ofstream out(name, ios::binary); int n;
-	n = node_arr.size(); out.write(reinterpret_cast<char*>(&n), sizeof(int));//node的数量
+	n = node_arr.size(); out.write(reinterpret_cast<char*>(&n), sizeof(int));//Number of nodes
 	for (auto e : node_arr) {
-		n = e->val.size(); out.write(reinterpret_cast<char*>(&n), sizeof(int));//val的数量
+		n = e->val.size(); out.write(reinterpret_cast<char*>(&n), sizeof(int));//The quantity of val
 		for (auto i : e->val)out.write(reinterpret_cast<char*>(&i), sizeof(int));
 
-		n = index[e->val[0]].size(); out.write(reinterpret_cast<char*>(&n), sizeof(int));//index的数量
+		n = index[e->val[0]].size(); out.write(reinterpret_cast<char*>(&n), sizeof(int));//The number of indices
 		for (const auto& i : index[e->val[0]]) {
 			out.write(reinterpret_cast<const char*>(&i.first), sizeof(int));
-			n = i.second.size(); out.write(reinterpret_cast<char*>(&n), sizeof(int));//path的数量
+			n = i.second.size(); out.write(reinterpret_cast<char*>(&n), sizeof(int));//The number of paths
 			for (auto e : i.second) {
 				out.write(reinterpret_cast<const char*>(&e.weight), sizeof(int)); 
 				out.write(reinterpret_cast<const char*>(&e.labels), sizeof(e.labels));
 			}
 		}
 	}
-	n = node_index.size(); out.write(reinterpret_cast<char*>(&n), sizeof(int));//node_index的数量
+	n = node_index.size(); out.write(reinterpret_cast<char*>(&n), sizeof(int));//The quantity of node_index
 	for (auto x : node_index) out.write(reinterpret_cast<char*>(&x), sizeof(int));
 	out.close();
 }
@@ -1937,7 +1935,7 @@ void Graph1::saveLLSD(string name,int step) {
 			mask = 0;
 			for (int i = 0; i < L; ++i) {
 				if (y[i] != INT_MAX)
-					mask |= (1 << i); // 设置 bitmask
+					mask |= (1 << i); // Set Bitmask
 			}
 
 			out.write(reinterpret_cast<char*>(&mask), sizeof(uint16_t));
