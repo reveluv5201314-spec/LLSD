@@ -2,17 +2,17 @@
 #include "Graph.h"
 
 
-//±£´æÊ÷
+//Save Tree
 void test_save(string graph, string output1, string output2,int alpha) {
 	Graph1 p;
 	auto t1 = chrono::steady_clock::now();
 	p.readGraph(graph);
 	for (auto& x : p.tolabel) {
-		cout << "±ßÐòºÅ£º" << x.first << "  ±ß±êÇ©£º" << x.second.second << "  ±ßÆµ´Î£º" << x.second.first << endl;
+		cout << "Edge number:" << x.first << "  Edge label:" << x.second.second << "  Edge frequency:" << x.second.first << endl;
 	}
-	p.treeNodeContraction();//Éú³ÉÊ÷½Úµã£ºÑ°ÕÒ×îÐ¡¶Èµã£¬Éú³Éµ¥¸öÊ÷½Úµã£¬Éú³ÉÁÚ¾Ó±ß£¬É¾³ý×îÐ¡¶Èµã¡£
-	p.treeFormation();//ºÏ³É·Ö½âÊ÷£º½«Ê÷½Úµã°´ÕÕÉ¾³ýË³ÐòÁ¬½Ó¡£
-	p.labelAssignment();//´ÓÉÏÖÁÏÂ»ØËÝ×æÏÈÐÅÏ¢£¬ÍêÉÆÌì¼ÊÏßÂ·¾¶;
+	p.treeNodeContraction();//Generate tree nodes: Find the minimum degree point, generate a single tree node, generate neighboring edges, and delete the minimum degree point.
+	p.treeFormation();//Composite decomposition tree: Connect tree nodes in the order of deletion.
+	p.labelAssignment();//Tracing back ancestral information from top to bottom and refining the skyline path.
 	//p.readTree(output1);
 	p.get_h_and_w();
 	//p.outputTree();
@@ -47,7 +47,7 @@ void test_save2hop(string graph, string tree, string output) {
 	Graph1 p;
 	p.readGraph(graph);
 	for (auto& x : p.tolabel) {
-		cout << "±ßÐòºÅ£º" << x.first << "  ±ß±êÇ©£º" << x.second.second << "  ±ßÆµ´Î£º" << x.second.first << endl;
+		cout << "Edge number:" << x.first << "  Edge label:" << x.second.second << "  Edge frequency:" << x.second.first << endl;
 	}
 	p.readTree(tree);
 	p.get_h_and_w();
@@ -56,18 +56,18 @@ void test_save2hop(string graph, string tree, string output) {
 	//p.save2hopbinary(output);
 }
 
-//¹Ì¶¨Éú³É1¶Ô²éÑ¯
+//Fixed generation of 1 pair of queries
 void test(string graph, string tree, string LLSD, int alpha) {
 	Graph1 p;
 	p.readGraph(graph);
 	for (auto& x : p.tolabel) {
-		cout << "±ßÐòºÅ£º" << x.first << "  ±ß±êÇ©£º" << x.second.second << "  ±ßÆµ´Î£º" << x.second.first << endl;
+		cout << "Edge number:" << x.first << "  Edge label:" << x.second.second << "  Edge frequency:" << x.second.first << endl;
 	}
 	p.readTree(tree);
 	
-	//p.treeNodeContraction();//Éú³ÉÊ÷½Úµã£ºÑ°ÕÒ×îÐ¡¶Èµã£¬Éú³Éµ¥¸öÊ÷½Úµã£¬Éú³ÉÁÚ¾Ó±ß£¬É¾³ý×îÐ¡¶Èµã¡£
-	//p.treeFormation();//ºÏ³É·Ö½âÊ÷£º½«Ê÷½Úµã°´ÕÕÉ¾³ýË³ÐòÁ¬½Ó¡£
-	//p.labelAssignment();//´ÓÉÏÖÁÏÂ»ØËÝ×æÏÈÐÅÏ¢£¬ÍêÉÆÌì¼ÊÏßÂ·¾¶;
+	//p.treeNodeContraction();
+	//p.treeFormation();
+	//p.labelAssignment();
 	//p.outputTree();
 	//p.preProcess();
 	p.get_h_and_w();
@@ -91,7 +91,7 @@ void temp_rhoavg(string graph, string tree, string LLSD) {
 	p.readTree(tree);
 	p.readLLSD(LLSD);
 	for (auto& x : p.tolabel) {
-		cout << "±ßÐòºÅ£º" << x.first << "  ±ß±êÇ©£º" << x.second.second << "  ±ßÆµ´Î£º" << x.second.first << endl;
+		cout << "Edge number:" << x.first << "  Edge label:" << x.second.second << "  Edge frequency:" << x.second.first << endl;
 	}
 	int a = 0; long long total = 0; int x1 = 0, x2 = 0, max_value = 0;;
 	for (int i = 1; i < p.indexanc_LLSD.size(); ++i) {	
@@ -128,7 +128,7 @@ void temp_var(string graph, string tree, string LLSD) {
 	p.get_h_and_w();
 	p.readLLSD(LLSD);
 	for (auto& x : p.tolabel) {
-		cout << "±ßÐòºÅ£º" << x.first << "  ±ß±êÇ©£º" << x.second.second << "  ±ßÆµ´Î£º" << x.second.first << endl;
+		cout << "Edge number:" << x.first << "  Edge label:" << x.second.second << "  Edge frequency:" << x.second.first << endl;
 	}
 	int a = 0; long long total = 0; int max_val, min_val = 0;
 	unordered_map<int, double> mp;
@@ -158,7 +158,7 @@ void temp_var(string graph, string tree, string LLSD) {
 		
 	}
 	for (int i = 0; i < p.height;++i) {
-		cout << i<<"²ã : "<<mp[i] / count[i] << endl;
+		cout << i<<"å±‚ : "<<mp[i] / count[i] << endl;
 	}
 	
 }
@@ -169,11 +169,11 @@ void querytest(string graph, string tree, string LLSD, string name, int alpha) {
 	p.readGraph(graph);
 	p.readTree(tree);
 	for (auto& x : p.tolabel) {
-		cout << "±ßÐòºÅ£º" << x.first << "  ±ß±êÇ©£º" << x.second.second << "  ±ßÆµ´Î£º" << x.second.first << endl;
+		cout << "Edge number:" << x.first << "  Edge label:" << x.second.second << "  Edge frequency:" << x.second.first << endl;
 	}
-	//p.treeNodeContraction();//Éú³ÉÊ÷½Úµã£ºÑ°ÕÒ×îÐ¡¶Èµã£¬Éú³Éµ¥¸öÊ÷½Úµã£¬Éú³ÉÁÚ¾Ó±ß£¬É¾³ý×îÐ¡¶Èµã¡£
-	//p.treeFormation();//ºÏ³É·Ö½âÊ÷£º½«Ê÷½Úµã°´ÕÕÉ¾³ýË³ÐòÁ¬½Ó¡£
-	//p.labelAssignment();//´ÓÉÏÖÁÏÂ»ØËÝ×æÏÈÐÅÏ¢£¬ÍêÉÆÌì¼ÊÏßÂ·¾¶;
+	//p.treeNodeContraction();
+	//p.treeFormation();
+	//p.labelAssignment();
 	p.get_h_and_w();
 	p.readLLSD(LLSD);
 	//p.settingLLSD();
@@ -188,11 +188,11 @@ void querytest2(string graph, string tree, string LLSD, string name) {
 	p.readTree(tree);
 	
 	for (auto& x : p.tolabel) {
-		cout << "±ßÐòºÅ£º" << x.first << "  ±ß±êÇ©£º" << x.second.second << "  ±ßÆµ´Î£º" << x.second.first << endl;
+		cout << "Edge number:" << x.first << "  Edge label:" << x.second.second << "  Edge frequency:" << x.second.first << endl;
 	}
-	//p.treeNodeContraction();//Éú³ÉÊ÷½Úµã£ºÑ°ÕÒ×îÐ¡¶Èµã£¬Éú³Éµ¥¸öÊ÷½Úµã£¬Éú³ÉÁÚ¾Ó±ß£¬É¾³ý×îÐ¡¶Èµã¡£
-	//p.treeFormation();//ºÏ³É·Ö½âÊ÷£º½«Ê÷½Úµã°´ÕÕÉ¾³ýË³ÐòÁ¬½Ó¡£
-	//p.labelAssignment();//´ÓÉÏÖÁÏÂ»ØËÝ×æÏÈÐÅÏ¢£¬ÍêÉÆÌì¼ÊÏßÂ·¾¶;
+	//p.treeNodeContraction();
+	//p.treeFormation();
+	//p.labelAssignment();
 	p.get_h_and_w();
 	p.readLLSD(LLSD);
 	//p.settingLLSD();
@@ -208,17 +208,17 @@ int main(int argc, char* argv[]) {
 	string LSD_index = argv[2];
 	string LLSD_index = argv[3];
 	
-	string alpha = argv[4];//°Ù·ÖÖ®¶àÉÙ
+	string alpha = argv[4];//percentage
 	string mode = argv[5];
 	
 	if (mode == "0") {
 		if (argc != 6) return 0;
-		test_save(dataset, LSD_index, LLSD_index, stoi(alpha));//Éú³ÉË÷Òý
+		test_save(dataset, LSD_index, LLSD_index, stoi(alpha));//Generate index
 	}
 	else {
 		if (argc != 7) return 0;
 		string queryfile = argv[6];
-		querytest(dataset, LSD_index, LLSD_index, queryfile, stoi(alpha));//²âÊÔ°¸Àý
+		querytest(dataset, LSD_index, LLSD_index, queryfile, stoi(alpha));//dataset case
 	}
 
 	return 0;
