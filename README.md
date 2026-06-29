@@ -27,15 +27,26 @@ Traditional shortest path algorithms (such as Dijkstra) have low efficiency when
 g++ -std=c++17 -O2 Graph.cpp Tree.cpp utility.cpp test.cpp -o LLSD  
 ```
 
-### Running Method  
+### Construction
+
+```js
+.\LLSD.exe [test set] [LSD index] [LLSD index] [hierarchical parameter] [test mode]
+```
+- [test set] represents the input undirected weighted graph dataset, formatted as ={number of edges, [source vertex, target vertex, edge weight, edge label], [source vertex, target vertex, edge weight, edge label]...}
+- [LSD index] represents the name of the LSD index to be generated, including the decomposition tree structure
+- [LLSD index] represents the name of the LLSD index to be generated
+- [hierarchical parameter] represents the hierarchical parameter α, with a value range of 0-100
+- [test mode] represents the execution mode, where 0 indicates index construction and 1 indicates data testing
+
+### Search
 
 ```js
 .\LLSD.exe [test set] [LSD index] [LLSD index] [hierarchical parameter] [test mode] [query set]
 ```
 
 - [test set] represents the input undirected weighted graph dataset, formatted as ={number of edges, [source vertex, target vertex, edge weight, edge label], [source vertex, target vertex, edge weight, edge label]...}
-- [LSD index] represents the name of the LSD index to be generated or loaded, including the decomposition tree structure
-- [LLSD index] represents the name of the LLSD index to be generated or loaded
+- [LSD index] represents the name of the LSD index to be loaded, including the decomposition tree structure
+- [LLSD index] represents the name of the LLSD index to be loaded
 - [hierarchical parameter] represents the hierarchical parameter α, with a value range of 0-100
 - [test mode] represents the execution mode, where 0 indicates index construction and 1 indicates data testing
-- [query set] represents the name of the test set to be loaded
+- [query set] represents the name of the test set
