@@ -13,21 +13,21 @@ public:
 	vector<Edge> edgelist;
 	vector<point> pts;
 	vector<int> node_index;
-	bitset<L> all_labels;//所有标签
-	unordered_map<int, unordered_map<int, list<Path>>> edges_neibr;//点到邻居的路径集
-	unordered_map<int, pair<int, int>> tolabel;//<编号，<出现次数，对应标签>>
-	unordered_set<int> computed;//统计计算的节点数量
+	bitset<L> all_labels;//All labels
+	unordered_map<int, unordered_map<int, list<Path>>> edges_neibr;//Path set from point to neighbor
+	unordered_map<int, pair<int, int>> tolabel;//<Number,<Number of occurrences, Corresponding tags>>
+	unordered_set<int> computed;//Number of nodes for statistical calculation
 
 
-	vector<int> node_height;//存储节点高度
-	vector<vector<array<int, L>>> indexanc_LLSD;//array上的数字为INT_MAX，表示没路，否则表示下界weight
+	vector<int> node_height;//Storage node height
+	vector<vector<array<int, L>>> indexanc_LLSD;//The number on the array is INT-MAX, indicating no path, otherwise it represents the lower bound weight
 
 
 	vector<unordered_map<int, list<Path>>> index;//LSD
-	vector<unordered_map<int, list<Path>>> temp_index;//暂存路径集
+	vector<unordered_map<int, list<Path>>> temp_index;//Temporary path set
 
 
-	vector<int> exist_s, exist_t;//暂存距离值
+	vector<int> exist_s, exist_t;//Temporary storage distance value
 
 	int rho;
 	double rhoavg;
@@ -73,8 +73,8 @@ public:
 	inline bool has_direct_index(int a, int b);
 	inline int Graph1::compute_weight(const int& src, const int& tar, const vector<int>& valid_labels);
 
-	void settingLLSD();//生成完全索引
-	void settingLLSD_p(int s);//生成部分索引
+	void settingLLSD();//Generate a complete index
+	void settingLLSD_p(int s);//Generate partial index
 
 	vector<Path> LLSDJoin(int v, int u, int w);
 
