@@ -22,7 +22,7 @@ void point::deleteNei(int i) {
 
 }
 
-//添加路径
+//Add Path
 void addPath_pure(vector<Path>& tar, Path& p) {
 	tar.emplace_back(p);
 }
@@ -57,7 +57,7 @@ void sortPathSet(vector<Path>& tar) {
 	sort(tar.begin(), tar.end(), lessPath);
 }
 
-//路径集拼接
+//Path set concatenation
 list<Path> pathJoin(list<Path>& a, list<Path>& b,int sep) {
 	list<Path> p;
 	bitset<L> conLabel = {};
@@ -110,7 +110,7 @@ vector<Path> pathUnion(vector<Path>& a, vector<Path>& b) {
 	return p;
 }
 
-//天际线prune
+//Skyline Prune
 void PrunePath(list<Path>& p) {
 	p.sort([](Path& a, Path& b) {return a.weight < b.weight; });
 	for (list<Path>::iterator pre = p.begin(); pre != p.end(); ++pre) {
@@ -141,29 +141,29 @@ void PrunePath_(vector<Path>& p) {
 
 	vector<bool> to_delete(p.size(), false);
 	for (int i = 0; i < p.size(); ++i) {
-		if (to_delete[i]) continue;  // 跳过已经标记为删除的路径
+		if (to_delete[i]) continue;  // Skip paths marked for deletion
 		for (int j = i + 1; j < p.size(); ++j) {
 			if (to_delete[j]) continue;
 			if (LabelBelong(p[i].labels, p[j].labels)) {
-				to_delete[j] = true;  // 标记为删除
+				to_delete[j] = true;  //Mark as deleted
 			}
 		}
 	}
 
-	// 批量删除所有标记的路径
+	// Batch delete all marked paths
 	auto new_end = remove_if(p.begin(), p.end(), [&](const Path& path) {
 		return to_delete[&path - &p[0]];
 		});
 	p.erase(new_end, p.end());
 }
 
-bool dominate(Path& a, Path& b) {//a是否支配b(相等不支配)
+bool dominate(Path& a, Path& b) {//Does a dominate b (equally not dominate)
 	if (a.weight < b.weight && LabelBelong(a.labels, b.labels)) return true;
 	if (a.weight <= b.weight && LabelBelong_true(a.labels, b.labels)) return true;
 	return false;
 }
 
-bool dominate2(Path& a, Path& b) {//a是否支配b(相等则支配)
+bool dominate2(Path& a, Path& b) {//Does a dominate b (if equal, dominate)
 	if (a.weight <= b.weight && LabelBelong(a.labels, b.labels)) return true;
 	return false;
 }
@@ -174,10 +174,10 @@ bool dominate(vector<Path>& p, Path& b) {
 }
 
 
-bool LabelBelong(bitset<L>& a, bitset<L>& b) {//判断a是否是b的子集
+bool LabelBelong(bitset<L>& a, bitset<L>& b) {//Determine whether a is a subset of b
 	return (a & b) == a;
 }
-bool LabelBelong_true(bitset<L>& a, bitset<L>& b) {//判断a是否是b的真子集
+bool LabelBelong_true(bitset<L>& a, bitset<L>& b) {//Determine whether a is a true subset of b
 	return (a & b) == a ? a == b ? false : true : true;
 }
 
