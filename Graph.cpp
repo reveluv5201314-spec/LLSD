@@ -1787,6 +1787,176 @@ void Graph1::settingLLSD_p(int s) {
 
 }
 
+void Graph1::processNode(shared_ptr<TreeNode> p)
+{
+	int v = p->val[0];
+	int n_v = static_cast<int>(p->valanc.size());
+	int height_v = node_height[v];
+
+	indexanc_ASTAR[v].resize(n_v - 1);
+
+	unordered_set<int> anc2(p->valanc.begin(), p->valanc.end());
+	anc2.erase(v);
+
+	// Process the existing index[v]
+	for (auto& x : index[v]) {
+		if (x.first == v)
+			continue;
+
+		array<int, L> entry;
+		entry.fill(INT_MAX);
+
+		for (auto pre = x.second.rbegin(); pre != x.second.rend(); ++pre) {
+			for (int j = L - 1; j >= 0; --j) {
+				if (pre->labels[j] == 1) {
+					entry[j] = pre->weight;
+					break;
+				}
+			}
+		}
+
+		anc2.erase(x.first);
+		indexanc_ASTAR[v][node_height[x.first] - 1] = move(entry);
+	}
+	temp_index[v] = index[v];
+
+	for (auto w : anc2) {
+		list<Path> Paths;
+
+		for (size_t ii = 1; ii < p->val.size(); ++ii) {
+			int p_val_i = p->val[ii];
+
+			auto it = temp_index[p_val_i].find(w);
+
+			list<Path> temp;
+			if (it != temp_index[p_val_i].end()) {
+				temp = pathJoin(
+					temp_index[v][p_val_i],
+					it->second,
+					p_val_i
+				);
+			}
+			else {
+				auto it2 = temp_index[w].find(p_val_i);
+				if (it2 != temp_index[w].end()) {
+					temp = pathJoin(
+						temp_index[v][p_val_i],
+						it2->second,
+						p_val_i
+					);
+				}
+			}
+
+			Paths.splice(Paths.end(), temp);
+		}
+
+		PrunePath(Paths);
+
+		array<int, L> entry;
+		entry.fill(INT_MAX);
+
+		for (auto& path : Paths) {
+			for (int j = L - 1; j >= 0; --j) {
+				if (path.labels[j] == 1) {
+					entry[j] = min(entry[j], path.weight);
+					break;
+				}
+			}
+		}
+
+		temp_index[v][w] = move(Paths);
+		indexanc_ASTAR[v][node_height[w] - 1] = move(entry);
+	}
+
+	totals.fetch_add(1, memory_order_relaxed);
+
+	int current_counter =
+		counter.fetch_add(1, memory_order_relaxed) + 1;
+
+	if (current_counter % 1000 == 0) {
+		cout << current_counter << " / " << ptsNum << " -- valid paths: "
+			<< totals.load(memory_order_relaxed) << endl;
+	}
+
+	// Submit the child nodes only after the current node is constructed
+	for (auto& c : p->children) {
+		pool.enqueue([this, c]() {
+			this->processNode(c);
+
+			if (c->children.empty()) {
+				this->try_cleanup_upwards( c, flag, node_mutex, totals
+				);
+			}
+			});
+	}
+}
+
+
+void Graph1::try_cleanup_upwards(shared_ptr<TreeNode> start,vector<atomic<int>>& flag,vector<mutex>& node_mutex,atomic<int>& totals){
+	shared_ptr<TreeNode> now = start;
+
+	while (now) {
+		int nv = now->val[0];
+		auto parent = now->parent;
+
+		bool expected = false;
+
+		if (!cleaned[nv].compare_exchange_strong( expected, true, memory_order_acq_rel, memory_order_acquire)) {
+			break;
+		}
+
+		if (!temp_index[nv].empty()) temp_index[nv].clear();
+
+		totals.fetch_sub(1, memory_order_relaxed);
+
+		if (!parent) break;
+
+		int pv = parent->val[0];
+		int old = flag[pv].fetch_sub( 1, memory_order_acq_rel );
+		if (old != 1) break;
+
+		now = parent;
+	}
+}
+
+
+void Graph1::settingAstarParallel()
+{
+	temp_index.clear();
+	temp_index.resize(ptsNum + 1);
+
+	indexanc_ASTAR.clear();
+	indexanc_ASTAR.resize(ptsNum + 1);
+
+	if (!root) return;
+
+	stack<shared_ptr<TreeNode>> s;
+	s.push(root);
+
+	while (!s.empty()) {
+		auto p = s.top();
+		s.pop();
+
+		int v = p->val[0];
+		int child_num = static_cast<int>(p->children.size());
+
+		flag[v].store(child_num, memory_order_relaxed);
+		cleaned[v].store(false, memory_order_relaxed);
+
+		for (auto& c : p->children) s.push(c);
+	}
+
+	counter.store(0, memory_order_relaxed);
+	totals.store(0, memory_order_relaxed);
+
+	pool.enqueue([this]() {
+		this->processNode(root);
+
+		if (root->children.empty()) {
+			this->try_cleanup_upwards( root, flag, node_mutex, totals );
+		}
+		});
+}
 
 void Graph1::showLabel() {
 	cout << "Label list:" << endl;
