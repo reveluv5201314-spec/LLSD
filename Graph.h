@@ -18,7 +18,7 @@ public:
 	unordered_map<int, pair<int, int>> tolabel;//<Number,<Number of occurrences, Corresponding tags>>
 	unordered_set<int> computed;//Number of nodes for statistical calculation
 
-
+	
 	vector<int> node_height;//Storage node height
 	vector<vector<array<int, L>>> indexanc_LLSD;//The number on the array is INT-MAX, indicating no path, otherwise it represents the lower bound weight
 
@@ -32,8 +32,16 @@ public:
 	int rho;
 	double rhoavg;
 
+
+	vector<mutex> node_mutex;
+	vector<atomic<int>> flag;
+	vector<atomic<bool>> cleaned;
+	ThreadPool pool;
+	atomic<int> counter;
+	atomic<int> totals;
 public:
-	Graph() :edgeNum(0), ptsNum(0), delete_point_num(0),rho(0),rhoavg(0){};
+	Graph() :edgeNum(0), ptsNum(0), delete_point_num(0),rho(0),rhoavg(0),
+		cleaned(5000000), node_mutex(5000000), flag(5000000), pool(4), counter(0), totals(0){};
 	void readGraph(string graphname);
 	void organizeGraph();
 	void sortPaths();
@@ -75,6 +83,9 @@ public:
 
 	void settingLLSD();//Generate a complete index
 	void settingLLSD_p(int s);//Generate partial index
+	void settingAstarParallel();
+	void processNode(shared_ptr<TreeNode> p);
+	void try_cleanup_upwards(shared_ptr<TreeNode> start, vector<atomic<int>>& flag, vector<mutex>& node_mutex, atomic<int>& totals);
 
 	vector<Path> LLSDJoin(int v, int u, int w);
 
