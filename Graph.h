@@ -83,7 +83,7 @@ public:
 
 	void settingLLSD();//Generate a complete index
 	void settingLLSD_p(int s);//Generate partial index
-	void settingAstarParallel();
+	void settingLLSD_parallel();
 	void processNode(shared_ptr<TreeNode> p);
 	void try_cleanup_upwards(shared_ptr<TreeNode> start, vector<atomic<int>>& flag, vector<mutex>& node_mutex, atomic<int>& totals);
 
