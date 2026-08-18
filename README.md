@@ -37,7 +37,7 @@ Read the graph and construct LSD index and LLSD table:
 - [LSD index] represents the name of the LSD index to be generated, including the decomposition tree structure
 - [LLSD index] represents the name of the LLSD index to be generated
 - [hierarchical parameter] represents the hierarchical parameter α, with a value range of 0-100
-- [test mode] represents the execution mode, where 0 indicates index construction and 1 indicates data testing
+- [test mode] represents the execution mode, where 0 indicates index construction, 1 indicates parallel index construction, and 2 indicates data testing 
 
 ### Search
 
