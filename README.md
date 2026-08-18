@@ -3,7 +3,7 @@
 
 This project is a graph algorithm designed for the Label-Constrained Shortest Path (LCSP) query problem, which is mainly used to efficiently process "shortest path queries satisfying label constraints" in complex graph structures.
 
-The algorithm transforms the original graph data into an efficient queryable index structure by constructing a structured index and hierarchical representation of the graph, thereby significantly improving the efficiency of path queries under complex constraints.
+The algorithm transforms the original graph data into an efficient queryable index structure by constructing a structured index and hierarchical representation of the graph, thereby significantly improving the efficiency of path queries under complex constraints. To further enhance scalability and preprocessing efficiency, the project incorporates a parallelized index construction mechanism, enabling multiple construction tasks to be executed concurrently and reducing index construction time, particularly for large-scale graphs.
 
 ## Project Objectives
 
