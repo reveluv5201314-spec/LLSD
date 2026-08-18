@@ -43,6 +43,45 @@ void test_save(string graph, string output1, string output2,int alpha) {
 	return;
 }
 
+void test_save_parallel(string graph, string output1, string output2,int alpha) {
+	Graph1 p;
+	auto t1 = chrono::steady_clock::now();
+	p.readGraph(graph);
+	for (auto& x : p.tolabel) {
+		cout << "Edge number:" << x.first << "  Edge label:" << x.second.second << "  Edge frequency:" << x.second.first << endl;
+	}
+	p.treeNodeContraction();//Generate tree nodes: Find the minimum degree point, generate a single tree node, generate neighboring edges, and delete the minimum degree point.
+	p.treeFormation();//Composite decomposition tree: Connect tree nodes in the order of deletion.
+	p.labelAssignment();//Tracing back ancestral information from top to bottom and refining the skyline path.
+	//p.readTree(output1);
+	p.get_h_and_w();
+	//p.outputTree();
+	p.saveTree(output1);
+
+	auto t2 = chrono::steady_clock::now();
+	double dr_us1 = chrono::duration<float, std::ratio<1>>(t2 - t1).count();
+	int step = ((alpha) / (double)100) * p.height;
+	cout << "***tree time cost:" << dr_us1 << endl;
+	//p.readLLSD(output2);
+	t1 = chrono::steady_clock::now();
+	//p.settingLLSD();
+	p.settingLLSD_parallel(step);
+	p.pool.wait();
+	t2 = chrono::steady_clock::now();
+	string out_name = "setting_time_result_" + to_string(alpha) +"0%_" + graph;
+	ofstream out(out_name);
+	double dr_us2 = chrono::duration<float, std::ratio<1>>(t2 - t1).count();
+	out << graph << ":" << endl;
+	out << "***tree time cost:" << dr_us1 << endl;
+	out << "***setting time cost:" << dr_us2 << endl;
+	out.close();
+
+	
+	p.saveLLSD(output2, step);
+
+	cout << "over" << endl;
+	return;
+}
 void test_save2hop(string graph, string tree, string output) {
 	Graph1 p;
 	p.readGraph(graph);
@@ -214,6 +253,10 @@ int main(int argc, char* argv[]) {
 	if (mode == "0") {
 		if (argc != 6) return 0;
 		test_save(dataset, LSD_index, LLSD_index, stoi(alpha));//Generate index
+	}
+	else if(mode == "1"){
+		if (argc != 6) return 0;
+		test_save_parallel(dataset, LSD_index, LLSD_index, stoi(alpha));//Parallel generate index
 	}
 	else {
 		if (argc != 7) return 0;
