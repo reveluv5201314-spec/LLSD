@@ -1793,7 +1793,7 @@ void Graph1::processNode(shared_ptr<TreeNode> p)
 	int n_v = static_cast<int>(p->valanc.size());
 	int height_v = node_height[v];
 
-	indexanc_ASTAR[v].resize(n_v - 1);
+	indexanc_LLSD[v].resize(n_v - 1);
 
 	unordered_set<int> anc2(p->valanc.begin(), p->valanc.end());
 	anc2.erase(v);
@@ -1816,7 +1816,7 @@ void Graph1::processNode(shared_ptr<TreeNode> p)
 		}
 
 		anc2.erase(x.first);
-		indexanc_ASTAR[v][node_height[x.first] - 1] = move(entry);
+		indexanc_LLSD[v][node_height[x.first] - 1] = move(entry);
 	}
 	temp_index[v] = index[v];
 
@@ -1865,13 +1865,12 @@ void Graph1::processNode(shared_ptr<TreeNode> p)
 		}
 
 		temp_index[v][w] = move(Paths);
-		indexanc_ASTAR[v][node_height[w] - 1] = move(entry);
+		indexanc_LLSD[v][node_height[w] - 1] = move(entry);
 	}
 
 	totals.fetch_add(1, memory_order_relaxed);
 
-	int current_counter =
-		counter.fetch_add(1, memory_order_relaxed) + 1;
+	int current_counter = counter.fetch_add(1, memory_order_relaxed) + 1;
 
 	if (current_counter % 1000 == 0) {
 		cout << current_counter << " / " << ptsNum << " -- valid paths: "
@@ -1925,8 +1924,8 @@ void Graph1::settingLLSD_parallel()
 	temp_index.clear();
 	temp_index.resize(ptsNum + 1);
 
-	indexanc_ASTAR.clear();
-	indexanc_ASTAR.resize(ptsNum + 1);
+	indexanc_LLSD.clear();
+	indexanc_LLSD.resize(ptsNum + 1);
 
 	if (!root) return;
 
