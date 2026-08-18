@@ -1920,7 +1920,7 @@ void Graph1::try_cleanup_upwards(shared_ptr<TreeNode> start,vector<atomic<int>>&
 }
 
 
-void Graph1::settingAstarParallel()
+void Graph1::settingLLSD_parallel()
 {
 	temp_index.clear();
 	temp_index.resize(ptsNum + 1);
