@@ -65,7 +65,7 @@ void test_save_parallel(string graph, string output1, string output2,int alpha) 
 	//p.readLLSD(output2);
 	t1 = chrono::steady_clock::now();
 	//p.settingLLSD();
-	p.settingLLSD_parallel(step);
+	p.settingLLSD_parallel();
 	p.pool.wait();
 	t2 = chrono::steady_clock::now();
 	string out_name = "setting_time_result_" + to_string(alpha) +"0%_" + graph;
